@@ -21,8 +21,6 @@ alias fgrep='fgrep --color=auto'
 
 # Git
 alias groot='cd "$(git rev-parse --show-toplevel)"'
-alias gst='git status'
-alias glog='git log --oneline'
 
 # Python
 alias py-server='twistd -no web --path=. --port 8000'
@@ -30,5 +28,11 @@ alias py-server='twistd -no web --path=. --port 8000'
 # Sublime
 alias subl='/Applications/Sublime\ Text\ 2.app/Contents/SharedSupport/bin/subl'
 
-# SSH
+# Place SSH keys in hand
 alias keys-in-hand='eval "$(ssh-agent -s)" && ssh-add'
+
+# Docker
+# This comes from: http://blog.yohanliyanage.com/2015/05/docker-clean-up-after-yourself/
+# Having old images around while doing Django migrations earned my any gray hairs
+alias clear-docker-exited='docker rm -v $(docker ps -a -q -f status=exited)'
+alias clear-docker-cache='docker rmi -f $(docker images -f "dangling=true" -q)'
