@@ -1,0 +1,64 @@
+#!/bin/bash
+
+# Resources
+# http://blog.mattcrampton.com/post/64144666914/managing-wifi-connections-using-the-mac-osx
+# https://www.sparklabs.com/forum/viewtopic.php?t=1157
+
+MAX_FAILURES=5
+SLEEP_TIME=30
+WIFI_SITE="www.google.com" # some search engine
+
+reset_wifi() {
+    networksetup -setairportpower en0 off
+    networksetup -setairportpower en0 on
+}
+
+log_event () {
+    echo `date +"[%Y-%m-%d %H:%M:%S]: "`$1 >&2
+}
+
+ping_once () {
+    ping -c 1 $1 2> /dev/null 1> /dev/null
+}
+
+# Parse command line args
+for i in "$@"
+do
+    if [ "$i"=="-h" ]
+        then
+        echo ""
+        echo "Utility for keeping Wifi active on Mac."
+        echo
+        echo "  Will ping ${WIFI_SITE} every ${SLEEP_TIME} seconds to check for internet connection."
+        echo "  Will try to reset internet connection up to ${MAX_FAILURES} in a row before failed exit."
+        exit 0
+    fi
+done
+
+while true; do
+
+    wifi_fail_count=0
+    wifi_success=0
+    while [ ${wifi_success} -eq "0" ]; do
+        ping_once "${WIFI_SITE}"
+        if [ "$?" -eq "0" ]
+            then
+                log_event "WiFi connected"
+                wifi_success=1
+            else
+                if [ ${wifi_fail_count} -lt ${MAX_FAILURES} ]
+                    then
+                        wifi_fail_count=$((${wifi_fail_count} + 1))
+                        log_event "WiFi not connected. Attemping reset #${wifi_fail_count}"
+                        reset_wifi
+                        sleep ${SLEEP_TIME}
+                    else
+                        log_event "WiFi connection failed ${MAX_FAILURES} times. Exiting program"
+                        exit 127
+                fi
+        fi
+
+    sleep ${SLEEP_TIME}
+    done
+
+done
