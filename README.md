@@ -1,5 +1,7 @@
 # bash_config
 
+I should have named this mac config :-|
+
 Use to manage configs accross computers. Run the following to setup:
 ```
 bash setup.sh
