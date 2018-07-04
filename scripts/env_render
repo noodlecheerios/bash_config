@@ -1,0 +1,5 @@
+#! bin/bash
+
+# Renders a template with environmental variables
+
+eval "echo \"$(cat $1)\""
